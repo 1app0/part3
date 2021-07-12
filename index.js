@@ -12,6 +12,7 @@ morgan.token('reqBody', (req, res) => {
 app.use(cors())
 app.use(express.json())
 app.use(morgan(':method :url :status :response-time ms :reqBody'))
+app.use(express.static('build'))
 
 const baseUri = '/api/persons'
 
