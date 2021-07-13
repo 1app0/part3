@@ -54,7 +54,7 @@ app.delete(`${baseUri}/:id`, (request, response) => {
 })
 
 //save a person to db
-app.post(`${baseUri}`, (request, response) => {
+app.post(`${baseUri}`, (request, response, next) => {
   const body = request.body
 
   if (!(body.name && body.number)) {
@@ -68,9 +68,12 @@ app.post(`${baseUri}`, (request, response) => {
     number: body.number,
   })
 
-  person.save().then(savedPerson => {
-    response.json(savedPerson)
-  })
+  person
+    .save()
+    .then(savedPerson => {
+      response.json(savedPerson)
+    })
+    .catch(error => next(error))
 })
 
 //update a person
@@ -82,7 +85,11 @@ app.put(`${baseUri}/:id`, (request, response, next) => {
     number: body.number,
   }
 
-  Person.findByIdAndUpdate(request.params.id, person, { new: true })
+  Person.findByIdAndUpdate(request.params.id, person, {
+    runValidators: true,
+    new: true,
+    context: 'query',
+  })
     .then(updatedPerson => {
       response.json(updatedPerson)
     })
@@ -100,6 +107,8 @@ const errorHandler = (error, request, response, next) => {
 
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'Malformed id' })
+  } else if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message })
   }
 
   next(error)
