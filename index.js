@@ -25,14 +25,14 @@ app.get(baseUri, (request, response) => {
   })
 })
 
-app.get('/info', (request, response) => {
-  const date = new Date()
-  const phonebookLenght = `Phonebook has info for ${persons.length} people`
-  response.send(`<p>${phonebookLenght}</p><p>${date}</p>`)
-})
+// app.get('/info', (request, response) => {
+//   const date = new Date()
+//   const phonebookLenght = `Phonebook has info for ${persons.length} people`
+//   response.send(`<p>${phonebookLenght}</p><p>${date}</p>`)
+// })
 
 //get a person based on id
-app.get(`${baseUri}/:id`, (request, response) => {
+app.get(`${baseUri}/:id`, (request, response, next) => {
   Person.findById(request.params.id)
     .then(person => {
       if (person) {
@@ -45,7 +45,7 @@ app.get(`${baseUri}/:id`, (request, response) => {
 })
 
 //delete a person based on id
-app.delete(`${baseUri}/:id`, (request, response) => {
+app.delete(`${baseUri}/:id`, (request, response, next) => {
   Person.findByIdAndRemove(request.params.id)
     .then(result => {
       response.status(204).end()
